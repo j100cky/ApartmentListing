@@ -2,21 +2,47 @@
 import React, { useState } from 'react';
 import { ScrollView, View,ImageBackground , Text, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Ensure you have react-native-vector-icons or expo for icons
+import { FlatList } from 'react-native-web';
 
 
 const CustomCarousel = ({ images }) => {
- 
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const goNext = () => {
+        if(currentIndex < images.length-1){
+            setCurrentIndex(currentIndex+1);
+        }
+        else{
+            setCurrentIndex(0);
+        }
+    };
+
+    const goPrev = () => {
+        if(currentIndex > 0){
+            setCurrentIndex(currentIndex - 1);
+        }
+        else{
+            setCurrentIndex(images.length-1);
+        }
+    };
 
   return (
     <View style={styles.carouselWrapper}>
       {/* Left Arrow */}
-    
+        <TouchableOpacity onPress={goPrev} style={styles.arrowLeft}>
+            <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+
 
       {/* Image Carousel */}
-     
+     <ScrollView horizontal style={styles.carouselContainer}>
+        <Image key={currentIndex} source={{uri:images[currentIndex]}} style={styles.carouselImage} />
+     </ScrollView>
 
       {/* Right Arrow */}
-      
+         <TouchableOpacity onPress={goNext} style={styles.arrowRight}>
+            <Ionicons name="arrow-forward" size={24} color="white" />
+        </TouchableOpacity>
     </View>
   );
 };
@@ -32,7 +58,29 @@ const ApartmentDetails = ({ data }) => {
     <View style={styles.main}>
       <Text style={styles.header}>Luxury Apartments~Dreams begin here</Text>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-    
+        <FlatList
+            data={data}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => (
+                <View style={styles.card}>
+                    <Text style={styles.title}>{item.title}</Text>
+                    <Text style={styles.price}>{item.price}</Text>
+                    <Text style={styles.location}>{item.location}</Text>
+                    <Text style={styles.description}>{item.description}</Text>   
+                    <Text style={styles.details}>
+                        {item.bedrooms} Beds . {item.bathrooms} Baths
+                    </Text> 
+                     <Text style={styles.description}>Built-in year is <Text style={styles.location}>{item.yearBuilt}</Text></Text>
+                    <Text style={styles.description}>Covered Area is <Text style={styles.location}>{item.area}</Text></Text>
+                    <Text style={styles.description}>It includes {item.amenities}</Text>
+                    <Text style={styles.description}>It has {item.parking} parking facility</Text>
+                    <View testID="imageDisplay" style={styles.imageDisplay}>
+                        <CustomCarousel images={item.images}/>
+                    </View>
+                </View>
+            )}
+        />
+        showsVerticalScrollIndicator={false}
       </ScrollView>
     </View>
     </ImageBackground>
